@@ -1,8 +1,10 @@
 import axios from "axios";
+import pool from "../config/db.js";
 
 export const createComplaint = async (req, res) => {
     try {
-        const { description, duration, affected_count } = req.body;
+        const { description, duration, affected_count, image_url } = req.body;
+        const user_id = req.user.id;
 
         if (!description || !duration || !affected_count) {
             return res.status(400).json({ message: "All fields required" });
@@ -17,12 +19,24 @@ export const createComplaint = async (req, res) => {
 
         const { category, cluster_id, cluster_count, urgency } = mlResponse.data;
 
-        res.json({
-            message: "ML call successful",
-            category,
-            cluster_id,
-            cluster_count,
-            urgency
+        // Update cluster_count for all existing complaints in same cluster
+        await pool.query(
+            "UPDATE complaints SET cluster_count = $1 WHERE cluster_id = $2",
+            [cluster_count, cluster_id]
+        );
+
+        // Insert new complaint
+        const result = await pool.query(
+            `INSERT INTO complaints 
+            (user_id, description, department, duration, affected_count, cluster_id, cluster_count, urgency, image_url, status)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending')
+            RETURNING *`,
+            [user_id, description, category, duration, affected_count, cluster_id, cluster_count, urgency, image_url || null]
+        );
+
+        res.status(201).json({
+            message: "Complaint submitted",
+            complaint: result.rows[0]
         });
 
     } catch (err) {
