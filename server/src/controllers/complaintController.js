@@ -43,3 +43,22 @@ export const createComplaint = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+
+export const getMyComplaints = async (req, res) => {
+    try {
+        const user_id = req.user.id;
+
+        const result = await pool.query(
+            `SELECT * FROM complaints 
+             WHERE user_id = $1 
+             ORDER BY created_at DESC`,
+            [user_id]
+        );
+
+        res.json({ complaints: result.rows });
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
