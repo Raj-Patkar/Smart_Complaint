@@ -1,7 +1,7 @@
 # 🚀 Smart Complaint Management System (Backend)
 
 This repository contains the backend implementation of the **Smart Complaint Management System**, a college-focused platform designed to manage, categorize, and prioritize student complaints efficiently using a structured database and secure authentication.
-
+<!-- uvicorn main:app --reload -->
 ---
 
 ## 📌 Project Overview
