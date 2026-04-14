@@ -1,136 +1,51 @@
-# Smart Complaint Management System (Backend)
+# Smart Complaint Management System
 
-This repository contains the backend implementation of the **Smart Complaint Management System**, a college-focused platform designed to manage, categorize, and prioritize student complaints efficiently using a structured database and secure authentication.
-<!-- uvicorn main:app --reload -->
----
-
-## 📌 Project Overview
-
-In many colleges, complaints are handled manually, leading to delays and inefficiencies. This system aims to:
-
-* Digitize complaint submission
-* Enable structured complaint tracking
-* Provide a scalable backend for future ML-based prioritization
-* Ensure secure authentication using modern practices
+A college-focused platform that manages, categorizes, and prioritizes student complaints using Node.js, FastAPI, and ML models.
 
 ---
 
-## ✨ Features Implemented
-
-### 🔐 Authentication System
-
-* User Signup
-* User Login
-* Logout functionality
-* Password hashing using **bcrypt**
-* JWT-based authentication
-* Secure **HTTP-only cookies**
-
----
-
-### 🧱 Database (PostgreSQL - Neon)
-
-* Fully structured relational database
-* UUID-based primary keys
-* Foreign key relationships
-* Data validation using constraints
-
----
-
-### ⚙️ Backend
-
-* Built with **Node.js + Express**
-* PostgreSQL integration using `pg`
-* Environment-based configuration
-* REST API structure
-
----
-
-## 🧱 Database Schema
-
-### 👤 Users Table
-
-* `id` (UUID, Primary Key)
-* `name`
-* `email` *(restricted to @vit.edu.in)*
-* `password_hash`
-* `role` *(student / admin)*
-* `created_at`
-
----
-
-### 📢 Complaints Table
-
-* `id` (UUID, Primary Key)
-* `user_id` *(Foreign Key → Users.id)*
-* `description`
-* `department`
-  *(mess_food, infrastructure, academics, cleanliness, ragging, technical_issues, other)*
-* `urgency` *(low / medium / high)*
-* `status` *(pending / in_progress / resolved)*
-* `image_url`
-* `created_at`
-* `updated_at`
-
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
-smart-complaint-backend/
-│
-├── src/
-│   ├── config/
-│   │   └── db.js
-│   │
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   └── complaintController.js
-│   │
-│   ├── routes/
-│   │   ├── authRoutes.js
-│   │   └── complaintRoutes.js
-│   │
-│   ├── middleware/
-│   │
-│   └── app.js
-│
-├── .env
-├── .env.example
-├── package.json
-├── README.md
+smart-complaint-system/
+├── server/          # Node.js + Express backend
+├── fastapi-ml/      # FastAPI ML service
+└── README.md
 ```
 
 ---
 
-## ⚙️ Setup Instructions
+## Running the Project
 
-### 1️⃣ Clone the Repository
+### 1. Node.js Backend
 
-```
-git clone https://github.com/raj-patkar/smart-complaint-system.git
-cd smart-complaint-backend
-```
-
----
-
-### 2️⃣ Install Dependencies
-
-```
+```bash
+cd server
 npm install
+npm run dev
 ```
+
+Runs at `http://localhost:5000`
+
+### 2. FastAPI ML Service
+
+```bash
+cd fastapi-ml
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+Runs at `http://localhost:8000`
+
+> Both services must be running simultaneously for the system to work.
 
 ---
 
-### 3️⃣ Setup Environment Variables
+## Environment Variables
 
-Create a `.env` file in the root directory:
-
-```
-touch .env
-```
-
-Copy values from `.env.example`:
+Create a `.env` file inside `server/`:
 
 ```
 PORT=5000
@@ -140,136 +55,47 @@ JWT_SECRET=your_secret_key
 
 ---
 
-### 4️⃣ Setup Database (Neon PostgreSQL)
+## API Endpoints
 
-1. Create a project on Neon
-2. Copy your database connection string
-3. Run the following SQL schema in Neon SQL Editor:
+### Auth
 
-```
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/auth/signup` | Register (requires @vit.edu.in email) |
+| POST | `/api/auth/login` | Login, sets HTTP-only cookie |
+| POST | `/api/auth/logout` | Logout |
 
-CREATE TABLE users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL CHECK (email LIKE '%@vit.edu.in'),
-    password_hash TEXT NOT NULL,
-    role VARCHAR(20) NOT NULL DEFAULT 'student'
-        CHECK (role IN ('student', 'admin')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+### Complaints (Student)
 
-CREATE TABLE complaints (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    description TEXT NOT NULL,
-    department VARCHAR(50) NOT NULL CHECK (department IN (
-        'mess_food',
-        'infrastructure',
-        'academics',
-        'cleanliness',
-        'ragging',
-        'technical_issues',
-        'other'
-    )),
-    urgency VARCHAR(10) NOT NULL CHECK (urgency IN ('low', 'medium', 'high')),
-    status VARCHAR(20) DEFAULT 'pending'
-        CHECK (status IN ('pending', 'in_progress', 'resolved')),
-    image_url TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/complaints` | Submit complaint (calls ML pipeline) |
+| GET | `/api/complaints/my` | Get own complaints |
+
+### Admin
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/admin/complaints` | All complaints sorted by urgency |
+| PATCH | `/api/admin/complaints/:id/status` | Update complaint status |
 
 ---
 
-### 5️⃣ Start the Server
+## ML Pipeline
 
-```
-npm start
-```
+Each complaint goes through:
+1. Category classification (FastText via HuggingFace Gradio Space)
+2. Clustering (sentence-transformers)
+3. Urgency prediction (XGBoost)
 
-Server will run at:
-
-```
-http://localhost:5000
-```
+Returns: `category`, `cluster_id`, `cluster_count`, `urgency`
 
 ---
 
-## 🌐 API Endpoints
+## Tech Stack
 
-### 🔐 Authentication Routes
-
-| Method | Endpoint           | Description              |
-| ------ | ------------------ | ------------------------ |
-| POST   | `/api/auth/signup` | Register a new user      |
-| POST   | `/api/auth/login`  | Login and receive cookie |
-| POST   | `/api/auth/logout` | Logout user              |
-
----
-
-### 📢 Complaint Routes
-
-| Method | Endpoint          | Description          |
-| ------ | ----------------- | -------------------- |
-| POST   | `/api/complaints` | Create complaint     |
-| GET    | `/api/complaints` | Fetch all complaints |
-
----
-
-## 🧪 Testing
-
-Use **Postman** for testing:
-
-1. Signup → Create user
-2. Login → Check cookie (token)
-3. Create complaint
-4. Fetch complaints
-
----
-
-## 🔐 Security Notes
-
-* `.env` file is **not committed** for security reasons
-* Always use `.env.example` as reference
-* Never expose database credentials publicly
-
----
-
-## 🚀 Future Enhancements
-
-* JWT Middleware (route protection)
-* Role-based access (admin features)
-* Complaint upvote system
-* ML-based categorization
-* Duplicate complaint detection
-* Priority scoring system
-
----
-
-## 👨‍💻 Tech Stack
-
-* Node.js
-* Express.js
-* PostgreSQL (Neon)
-* JWT Authentication
-* bcrypt
-
----
-
-## 🎯 Project Goal
-
-To build an intelligent complaint management system that:
-
-* Improves response time
-* Prioritizes critical issues
-* Enhances student experience
-
----
-
-## 🙌 Contributors
-
-* Raj Patkar
-
----
+- Node.js + Express
+- FastAPI + Python
+- PostgreSQL (Neon)
+- JWT + bcrypt
+- sentence-transformers, XGBoost, FastText
