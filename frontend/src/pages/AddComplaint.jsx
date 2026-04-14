@@ -10,9 +10,10 @@ const AddComplaint = () => {
   const [form, setForm] = useState({
     description: "",
     duration: "",
-    affected_count: "",
-    image_url: ""
+    affected_count: ""
   });
+
+  const [imageFile, setImageFile] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -37,20 +38,9 @@ const AddComplaint = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🔹 IMAGE → BASE64
+  // IMAGE HANDLER (NO BASE64)
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setForm((prev) => ({
-        ...prev,
-        image_url: reader.result
-      }));
-    };
-
-    reader.readAsDataURL(file);
+    setImageFile(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
@@ -62,11 +52,10 @@ const AddComplaint = () => {
       const payload = {
         description: form.description,
         duration: durationMap[form.duration],
-        affected_count: affectedMap[form.affected_count],
-        image_url: form.image_url || null
+        affected_count: affectedMap[form.affected_count]
       };
 
-      const res = await createComplaint(payload);
+      const res = await createComplaint(payload, imageFile);
 
       if (res.message === "Complaint submitted") {
         setMessage("Complaint submitted successfully!");
@@ -74,9 +63,10 @@ const AddComplaint = () => {
         setForm({
           description: "",
           duration: "",
-          affected_count: "",
-          image_url: ""
+          affected_count: ""
         });
+
+        setImageFile(null);
 
         setTimeout(() => navigate("/student"), 1200);
       } else {
@@ -95,7 +85,6 @@ const AddComplaint = () => {
       <Navbar />
 
       <div className="add-complaint-container">
-
         <div className="complaint-card">
           <h2>Submit Complaint</h2>
 
@@ -158,7 +147,6 @@ const AddComplaint = () => {
 
           </form>
         </div>
-
       </div>
     </>
   );

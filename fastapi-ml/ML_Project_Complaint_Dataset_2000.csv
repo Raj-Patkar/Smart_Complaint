@@ -2022,10 +2022,10 @@ The food in the mess is very bad,Mess/Food,,,,,1.0,3.0,1.0
 food in the mess is very bad,Mess/Food,,,,,1.0,3.0,1.0
 Mess food quality is terrible today,Mess/Food,,,,,1.0,3.0,1.0
 AC is not working in labs,Infrastructure,,,,,2.0,1.0,2.0
-Washroom should be clean there's no clean washrooms in the college,Cleanliness,,,,,3.0,4.0,3.0
-Washroom should be clean there's no clean washrooms in the college,Cleanliness,,,,,3.0,4.0,3.0
-Washroom should be clean there's no clean washrooms in the college,Cleanliness,,,,,3.0,4.0,3.0
-Washroom is very dirty,Cleanliness,,,,,3.0,4.0,3.0
+Washroom should be clean there's no clean washrooms in the college,Cleanliness,,,,,3.0,5.0,3.0
+Washroom should be clean there's no clean washrooms in the college,Cleanliness,,,,,3.0,5.0,3.0
+Washroom should be clean there's no clean washrooms in the college,Cleanliness,,,,,3.0,5.0,3.0
+Washroom is very dirty,Cleanliness,,,,,3.0,5.0,3.0
 seniors were doing ragging,Ragging,,,,,4.0,8.0,4.0
 seniors were doing ragging,Ragging,,,,,4.0,8.0,4.0
 seniors were doing ragging,Ragging,,,,,4.0,8.0,4.0
@@ -2045,3 +2045,4 @@ Teacher is not coming to class regularly for 2 weeks,Academics,,,,,7.0,1.0,7.0
 Seniors are doing ragging in hostel block B,Ragging,,,,,4.0,8.0,4.0
 Seniors are doing ragging in hostel block B,Ragging,,,,,4.0,8.0,4.0
 Seniors are ragging every student in hostel,Ragging,,,,,4.0,8.0,4.0
+Washroom is very dirty,Cleanliness,,,,,3.0,5.0,3.0

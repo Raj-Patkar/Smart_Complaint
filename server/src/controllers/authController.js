@@ -2,6 +2,12 @@ import pool from "../config/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+export const getMe = (req, res) => {
+    res.json({
+        user: req.user
+    });
+};
+
 // SIGNUP
 export const signup = async (req, res) => {
     try {
@@ -73,7 +79,8 @@ export const login = async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true,
             secure: false, // true in production
-            sameSite: "lax"
+            sameSite: "lax",
+            path:"/"
         });
 
         res.json({
