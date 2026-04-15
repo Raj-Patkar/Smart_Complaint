@@ -53,9 +53,7 @@ return (
                 <span>Affected:</span> {c.affected_count}
               </div>
 
-              <div className="row">
-                <span>Cluster:</span> {c.cluster_id} ({c.cluster_count})
-              </div>
+              
               
               <div className={`row urgency ${c.urgency.toLowerCase()}`}>
                 <span>Urgency:</span> {c.urgency}

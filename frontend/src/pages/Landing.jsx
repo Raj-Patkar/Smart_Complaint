@@ -18,7 +18,6 @@ const Landing = () => {
       <div className="navbar">
         <div className="logo">
           <img src="/logo.png" alt="logo" />
-          <span>Smart Complaint System</span>
         </div>
         <div className="nav-buttons">
           <button className="login-btn" onClick={() => navigate("/login")}>
